@@ -2,8 +2,9 @@
 name: Bug report
 about: Report a reproducible bug in Duos Studio
 title: "[Bug]: "
-labels: ["bug", "needs-triage"]
-assignees: []
+labels: bug
+assignees: ''
+
 ---
 
 ## Summary

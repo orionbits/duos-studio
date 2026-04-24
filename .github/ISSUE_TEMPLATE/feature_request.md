@@ -2,8 +2,9 @@
 name: Feature request
 about: Suggest an improvement for Duos Studio
 title: "[Feature]: "
-labels: ["enhancement", "needs-triage"]
-assignees: []
+labels: enhancement
+assignees: ''
+
 ---
 
 ## Problem Statement
