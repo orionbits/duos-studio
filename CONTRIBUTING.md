@@ -1,53 +1,33 @@
 # Contributing to Duos Studio
 
-Thanks for contributing to Duos Studio. This guide helps you understand the project quickly and contribute safely.
+Thanks for helping improve Duos Studio. This guide explains how to contribute safely and get PRs merged faster.
 
-## Project Goals
+## Project Overview
 
-Duos Studio is a local-first app that:
-- Parses tagged educational Markdown
-- Renders interactive exercise components
-- Keeps workflow clean, fast, and scroll-friendly
-- Runs without external APIs/services
+Duos Studio is a local-first learning content studio that:
+- Parses tagged educational Markdown into structured blocks
+- Renders reading and interactive exercises
+- Stores user data in browser storage only
+- Runs fully offline (no required cloud services)
 
 ## Tech Stack
 
 - Next.js (App Router)
 - React + TypeScript
-- Tailwind CSS + shadcn/ui components
-- Vitest for parser/unit tests
-- Zod for schema validation
+- Tailwind CSS + shadcn/ui
+- Zod schemas for runtime validation
+- Vitest for parser/unit testing
 
-## Core Architecture
+## Repository Map
 
-### Main Flow
-
-1. User imports/pastes tagged content in the Studio import workspace.
-2. `parseTaggedInput` (in `lib/parser.ts`) converts markdown into typed blocks.
-3. Blocks are validated against schemas in `lib/schemas.ts`.
-4. `ExerciseRenderer` maps blocks to dedicated exercise components.
-5. Focused content page provides section tabs + pagination for readability.
-
-### Important Directories
-
-- `app/`
-  - `page.tsx` - home/studio shell
-  - `content/page.tsx` - focused parsed-content view
-  - `api/health/route.ts` - lightweight health endpoint
-- `components/studio/`
-  - `Studio.tsx` - main studio orchestration
-  - `ImportWorkspace.tsx` - input/upload/editor workspace
-  - `HistoryView.tsx` - local snapshot library
-- `components/exercises/`
-  - Individual exercise renderers (fill blank, matching, true/false, etc.)
-- `components/ExerciseRenderer.tsx`
-  - Block-to-component dispatch layer
-- `lib/`
-  - `parser.ts` - markdown parser
-  - `schemas.ts` - block schemas/types
-  - `parser.test.ts` - parser behavior tests
-- `sample.md`
-  - Full end-to-end sample content for manual validation
+- `app/` - routes and page shells
+- `components/studio/` - import, review, and snapshot workflow
+- `components/exercises/` - exercise-type renderers
+- `components/ExerciseRenderer.tsx` - block-to-renderer dispatcher
+- `lib/parser.ts` - tagged content parser
+- `lib/schemas.ts` - schema definitions + validation helpers
+- `lib/parser.test.ts` - parser tests
+- `sample.md` - real sample input for manual validation
 
 ## Local Setup
 
@@ -56,74 +36,89 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Then open [http://localhost:3000](http://localhost:3000).
 
-## Testing Requirements
+## Branch Naming
 
-Before opening a PR, run:
+Use descriptive branch names:
+- `feat/<short-description>`
+- `fix/<short-description>`
+- `docs/<short-description>`
+- `test/<short-description>`
+
+Examples:
+- `feat/parser-metadata-warning`
+- `fix/history-json-parse-guard`
+
+## Pull Request Checklist
+
+Before creating a PR:
+1. Keep changes focused (one purpose per PR).
+2. Add/update tests for behavior changes.
+3. Update docs when required.
+4. Run:
 
 ```bash
 npm test
 npm run build
 ```
 
-At minimum, verify:
-- Parser still handles `sample.md`
-- Studio import -> compile -> content view works
-- No obvious regressions in existing exercise types
+5. Verify manually:
+- Import -> Compile -> Focus view flow
+- Existing exercise types still render
+- `sample.md` parses without regressions
 
-## Contribution Workflow
+## PR Description Template
 
-1. Create a feature/fix branch from latest main.
-2. Make focused changes (small PRs preferred).
-3. Update docs/tests when behavior changes.
-4. Run tests and build locally.
-5. Open PR with:
-   - What changed
-   - Why it changed
-   - How it was tested
-   - Screenshots/GIF for UI changes
+Please include:
+- **What changed**
+- **Why it changed**
+- **How it was tested**
+- **Screenshots/GIF** (for UI changes)
+
+## Issue Reporting Guide
+
+When opening issues, include:
+- Clear title (actionable and specific)
+- Expected behavior vs actual behavior
+- Repro steps
+- Example input (if parser-related)
+- Environment details (OS/browser/node)
+
+Use labels whenever possible:
+- Area: `area:parser`, `area:ui`, `area:docs`, `area:tests`, `area:storage`
+- Type: `bug`, `enhancement`, `refactor`, `docs`, `test`
+- Difficulty: `good first issue`, `difficulty:moderate`, `difficulty:hard`
 
 ## Coding Guidelines
 
-- Keep existing visual aesthetic consistent.
-- Do not introduce external API dependencies.
-- Preserve core parsing/rendering behavior unless explicitly changing spec.
-- Prefer clear composition over large monolithic components.
-- Remove dead code when touched.
-- Keep TypeScript types accurate and narrow.
+- Keep TypeScript types explicit and narrow.
+- Prefer small composable functions/components.
+- Preserve existing UX style and information hierarchy.
+- Avoid introducing external API dependencies.
+- Remove dead code while touching nearby code paths.
 
-## UI/UX Guidelines
+## Parser/Schema Change Requirements
 
-- Avoid long single-page dumps; prefer tabs, sections, pagination, and hierarchy.
-- Keep primary actions near relevant content.
-- Maintain existing color/typography/spacing tone.
-- Ensure mobile and desktop layouts remain usable.
-
-## Parser & Schema Changes
-
-If you change parsing or schema behavior:
+If parser or schema behavior changes:
 - Update `lib/parser.test.ts`
-- Add/adjust representative test cases
+- Add at least one failing-case test and one success-case test
 - Validate with `sample.md`
-- Confirm all affected exercise components still render safely
+- Confirm affected exercise components still render safely
 
 ## Offline-Only Policy
 
-This repository is intentionally offline/local-first.
+This project must stay local-first and usable without remote services.
 
-Do not add:
-- Gemini/OpenAI/etc. calls
-- Firebase/Supabase integration
-- Any mandatory remote dependency for core workflow
+Do not add mandatory dependencies on:
+- LLM APIs or remote inference providers
+- Firebase/Supabase or other hosted backends
+- Remote persistence required for core functionality
 
-## Common Pitfalls
+## Code of Conduct
 
-- Breaking block metadata assumptions (`id`, `type`, tags, etc.)
-- Returning partially invalid block data without schema-safe fallback
-- Reintroducing excessive vertical scrolling in content-heavy pages
-- Forgetting to test with realistic long input (`sample.md`)
+Be respectful, constructive, and kind in all discussions and reviews.
 
-## Questions
+## Need Help?
 
-If something is unclear, open a draft PR with notes on assumptions/tradeoffs so maintainers can guide direction early.
+If requirements are unclear, open a draft PR early and document your assumptions/tradeoffs.
