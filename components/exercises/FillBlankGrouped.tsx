@@ -165,8 +165,8 @@ export function FillBlankGrouped({
           <div className="space-y-6">
             <p className="text-base leading-relaxed text-slate-300 font-light">{sentenceTemplate}</p>
             <div className="grid gap-4">
-              {sortedBlanks.map((blank) => (
-                <div key={blank.position} className="flex flex-wrap items-center gap-4">
+              {sortedBlanks.map((blank, index) => (
+                <div key={`${id}-blank-${blank.position}-${index}`} className="flex flex-wrap items-center gap-4">
                   <label
                     htmlFor={`${id}-blank-${blank.position}`}
                     className="text-[10px] font-bold uppercase tracking-widest text-slate-500"

@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { FileText, Play, History, Settings, Sparkles, AlertTriangle } from "lucide-react";
+import { FileText, Play, History, Sparkles, AlertTriangle } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { parseTaggedInput } from "@/lib/parser";
 import { ExerciseRenderer } from "@/components/ExerciseRenderer";
 import {
@@ -20,6 +21,7 @@ import { HistoryView } from "./HistoryView";
 export type ParsedState = Array<ValidBlock | ErrorBlock>;
 
 export function Studio() {
+  const router = useRouter();
   const [input, setInput] = useState("");
   const [parsedBlocks, setParsedBlocks] = useState<ParsedState>([]);
   const [activeTab, setActiveTab] = useState("import");
@@ -78,12 +80,13 @@ export function Studio() {
         const validCount = validatedBlocks.length - errorCount;
 
         if (errorCount > 0) {
-          toast.warning(`Processed with ${errorCount} errors. Check the preview for details.`);
+          toast.warning(`Processed with ${errorCount} errors. Check the focused view for details.`);
         } else {
           toast.success(`Successfully processed ${validCount} blocks.`);
         }
-        
-        setActiveTab("preview");
+
+        localStorage.setItem("duos-studio-buffer", input);
+        router.push("/content");
       } catch (err) {
         console.error("Parsing failed:", err);
         toast.error("A critical error occurred during parsing. Check console for details.");
@@ -123,7 +126,7 @@ export function Studio() {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
         <TabsList className="bg-white/5 border border-white/10 rounded-2xl p-1 h-auto flex-wrap">
           <TabsTrigger 
             value="import" 
@@ -140,7 +143,7 @@ export function Studio() {
           >
             <div className="flex items-center gap-2">
               <Play size={14} />
-              Renderer
+              Review
             </div>
           </TabsTrigger>
           <TabsTrigger 
@@ -154,7 +157,7 @@ export function Studio() {
           </TabsTrigger>
         </TabsList>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
            <Button
             variant="outline"
             onClick={handleSave}
@@ -184,7 +187,7 @@ export function Studio() {
       </TabsContent>
 
       <TabsContent value="preview" className="mt-0 focus-visible:outline-none">
-        <Card className="bg-white/[0.02] border-white/5 rounded-[2.5rem] p-8 min-h-[600px] backdrop-blur-3xl">
+        <Card className="bg-white/[0.02] border-white/5 rounded-[2.5rem] p-8 min-h-[520px] backdrop-blur-3xl">
           {parsedBlocks.length === 0 ? (
             <div className="h-[500px] flex flex-col items-center justify-center text-center opacity-40">
               <div className="w-20 h-20 rounded-full border-2 border-dashed border-white/20 mb-6 flex items-center justify-center animate-spin-slow">
@@ -196,24 +199,34 @@ export function Studio() {
               </p>
             </div>
           ) : (
-            <div className="space-y-12">
-               <div className="flex items-center justify-between border-b border-white/5 pb-6 mb-6">
+            <div className="space-y-6">
+               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-white/5 pb-6 mb-2">
                 <div>
                   <h2 className="text-xl font-light text-white">Execution Result</h2>
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
                     {parsedBlocks.filter(b => !("error" in b)).length} Atomic Blocks Validated
                   </p>
                 </div>
-                {parsedBlocks.some(b => "error" in b) && (
-                   <div className="flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 px-4 py-2 rounded-xl">
-                     <AlertTriangle size={14} className="text-rose-400" />
-                     <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest">
-                       {parsedBlocks.filter(b => "error" in b).length} Parsing Failures
-                     </span>
-                   </div>
-                )}
+                <div className="flex items-center gap-3">
+                  {parsedBlocks.some(b => "error" in b) && (
+                    <div className="flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 px-4 py-2 rounded-xl">
+                      <AlertTriangle size={14} className="text-rose-400" />
+                      <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest">
+                        {parsedBlocks.filter(b => "error" in b).length} Parsing Failures
+                      </span>
+                    </div>
+                  )}
+                  <Button
+                    onClick={() => router.push("/content")}
+                    className="rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-[10px] font-bold uppercase tracking-widest text-slate-300"
+                  >
+                    Open Focus View
+                  </Button>
+                </div>
               </div>
-              <ExerciseRenderer blocks={parsedBlocks} />
+              <div className="max-h-[70vh] overflow-y-auto pr-2">
+                <ExerciseRenderer blocks={parsedBlocks} />
+              </div>
             </div>
           )}
         </Card>

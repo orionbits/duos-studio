@@ -62,16 +62,31 @@ export function ImportWorkspace({ input, setInput, onProcess, isProcessing }: Im
 
   return (
     <div className="grid gap-6">
-      <Card className="bg-white/[0.02] border-white/5 rounded-[2.5rem] p-10 backdrop-blur-3xl relative overflow-hidden group">
-        <div className="flex items-center justify-between mb-8 relative z-10">
-          <div>
+      <Card className="bg-white/[0.02] border-white/5 rounded-[2.5rem] p-8 md:p-10 backdrop-blur-3xl relative overflow-hidden group">
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between relative z-10">
+          <div className="space-y-1">
             <h2 className="text-xl font-light text-white">Source Input Layer</h2>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
               Tagged Markdown Engine v2.0
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-slate-200 text-[10px] uppercase font-bold tracking-[0.18em] px-4"
+            >
+              <UploadCloud size={14} className="mr-2" />
+              Upload File
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              accept=".md,.txt"
+              onChange={(e) => e.target.files && handleFileUpload(e.target.files[0])}
+            />
             <Button
               variant="outline"
               onClick={async () => {
@@ -80,7 +95,7 @@ export function ImportWorkspace({ input, setInput, onProcess, isProcessing }: Im
                   const text = await res.text();
                   setInput(text);
                   toast.success("Sample content loaded.");
-                } catch (e) {
+                } catch {
                   toast.error("Failed to load sample content.");
                 }
               }}
@@ -137,25 +152,6 @@ export function ImportWorkspace({ input, setInput, onProcess, isProcessing }: Im
               </p>
             </div>
           )}
-          
-          {!input && !isProcessing && (
-            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20">
-              <Button 
-                onClick={() => fileInputRef.current?.click()}
-                variant="outline"
-                className="px-6 py-2.5 rounded-xl border border-white/10 bg-white/5 text-[10px] uppercase font-bold tracking-[0.2em] hover:bg-white/10 transition-all active:scale-95"
-              >
-                Browse Local Files
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                className="hidden"
-                accept=".md,.txt"
-                onChange={(e) => e.target.files && handleFileUpload(e.target.files[0])}
-              />
-            </div>
-          )}
 
           {isProcessing && (
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm rounded-3xl">
@@ -167,7 +163,7 @@ export function ImportWorkspace({ input, setInput, onProcess, isProcessing }: Im
           )}
         </div>
 
-        <div className="mt-8 flex justify-end">
+        <div className="mt-6 flex justify-end">
            <Button
             onClick={onProcess}
             disabled={isProcessing || !input.trim()}

@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { parseBlock, parseTaggedInput } from "./parser";
 
 describe("parseBlock", () => {
@@ -287,5 +289,15 @@ tags: [sequence]
       expect(result[1].metadata.type).toBe("short_answer");
       expect(result[2].metadata.type).toBe("ordering");
     }
+  });
+
+  it("parses sample.md without runtime failures", () => {
+    const samplePath = resolve(process.cwd(), "sample.md");
+    const sampleContent = readFileSync(samplePath, "utf8");
+    const result = parseTaggedInput(sampleContent);
+
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.some((block) => !("error" in block) && block.category === "READING")).toBe(true);
+    expect(result.some((block) => !("error" in block) && block.category === "EXERCISE")).toBe(true);
   });
 });
